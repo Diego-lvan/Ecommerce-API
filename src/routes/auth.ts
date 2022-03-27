@@ -1,21 +1,12 @@
-import "dotenv/config"
-import express,{Router, Request,Response} from "express";
-import jwt from "jsonwebtoken"
-import authToken from "../middlewares/auth";
+import "dotenv/config";
+import express, { Router, Request, Response } from "express";
+import jwt from "jsonwebtoken";
+import { loginUser, registerUser } from "../controllers/auth";
+import { userExists } from "../middlewares/auth";
+const router: Router = express();
 
-const router:Router = express()
+router.post("/api/auth/login", loginUser);
 
-router.post("/login", (req:Request,res:Response) => {
-    const {username} = req.body
-    const accessToken = jwt.sign(username,process.env.ACCESS_TOKEN_SECRET!)
-    res.json({accessToken})
+router.post("/api/auth/register", userExists, registerUser);
 
-})
-
-router.get("/test",authToken,(req:Request,res:Response) => {
-    console.log(req.user)
-    res.json({user:req.user})
-})
-
-
-export default router
+export default router;

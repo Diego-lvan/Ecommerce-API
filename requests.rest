@@ -9,3 +9,11 @@ Content-Type: application/json
 ### Get all products
 GET http://localhost:5003/api/product 
 
+### Register user
+POST http://localhost:5003/api/auth/register
+Content-Type: application/json
+
+{
+    "email":"diego2@gmail.com",
+    "pwd":"123"
+}

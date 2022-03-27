@@ -1,7 +1,7 @@
 CREATE DATABASE store;
 USE store;
 CREATE TABLE product(
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    productID INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR (40) NOT NULL,
     price DOUBLE NOT NULL,
     description VARCHAR(300) NOT NULL,
@@ -10,3 +10,8 @@ CREATE TABLE product(
     color JSON
 );
 
+CREATE TABLE user(
+    userID INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(50) UNIQUE NOT NULL,
+    pwd VARCHAR(80) NOT NULL
+);
