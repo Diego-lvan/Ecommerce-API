@@ -1,0 +1,11 @@
+### Login user
+POST http://localhost:5003/login
+Content-Type: application/json
+
+{
+    "username":"Prueba"
+}
+
+### Get all products
+GET http://localhost:5003/api/product 
+
