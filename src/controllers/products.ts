@@ -1,10 +1,23 @@
-import { Request,Response } from "express"
-import pool from "../config/conn"
+import { Request, Response } from "express";
+import pool from "../config/conn";
 
-const getAllProducts = async(req:Request,res:Response) => {
-const [data] = await pool.query("SELECT * FROM product")
-    console.log(data)
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  stock: number;
+  brand: string;
+  colors: string[];
 }
-export default {getAllProducts}
 
+const getAllProducts = async (req: Request, res: Response) => {
+  const [products] = await pool.query("SELECT * FROM product");
+  res.json({ products });
+};
 
+const addProduct = async (req: Request, res: Response) => {
+  console.log("i pass");
+  res.json("you are an admin ");
+};
+
+export { getAllProducts, addProduct };

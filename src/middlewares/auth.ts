@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, query } from "express";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
 import { User } from "../controllers/auth";
@@ -32,4 +32,12 @@ const verifyCredentials = async (req: Request, res: Response, next: NextFunction
   res.json({ msg: "Password does not match" });
 };
 
-export { authToken, userExists, verifyCredentials };
+const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
+  const email: string = req.user;
+  const sql = "SELECT isAdmin FROM user WHERE email = ?";
+  const [[data]]: any = await pool.query(sql, [email]);
+  if (data.isAdmin === 1) return next();
+  res.json({ msg: "You are not an admin" });
+};
+
+export { authToken, userExists, verifyCredentials, isAdmin };

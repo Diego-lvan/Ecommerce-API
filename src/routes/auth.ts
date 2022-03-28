@@ -1,6 +1,5 @@
 import "dotenv/config";
-import express, { Router, Request, Response } from "express";
-import jwt from "jsonwebtoken";
+import express, { Router } from "express";
 import { loginUser, registerUser } from "../controllers/auth";
 import { userExists, verifyCredentials } from "../middlewares/auth";
 const router: Router = express();

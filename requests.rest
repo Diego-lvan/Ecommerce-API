@@ -1,28 +1,24 @@
-### Login user
-POST http://localhost:5003/login
-Content-Type: application/json
-
-{
-    "username":"Prueba"
-}
-
-### Get all products
-GET http://localhost:5003/api/product 
-
-### Register user
+### Register user raw
 POST http://localhost:5003/api/auth/register
 Content-Type: application/json
 
 {
-    "email":"diego223@gmail.com",
+    "email":"testing123@gmail.com",
     "pwd":"123"
 }
 
-###Login user
+###Login user raw
 POST http://localhost:5003/api/auth/login
 Content-Type: application/json
 
 {
-    "email":"diego223@gmail.com",
+    "email":"testing123@gmail.com",
     "pwd":"123"    
 }
+
+### Get all products
+GET http://localhost:5003/api/products
+
+### Create Product raw
+POST http://localhost:5003/api/products
+Authorization: bearer eyJhbGciOiJIUzI1NiJ9.ZGllZ29AZ21haWwuY29t.K_9gnp8eB5Q4YFkOPYfjpOsG7qBZKPFzQo-yfnkvi-M

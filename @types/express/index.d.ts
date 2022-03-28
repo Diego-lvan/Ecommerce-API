@@ -5,6 +5,7 @@ declare global {
     export interface Request {
       user: string;
       exists: User;
+      isAdmin: boolean;
     }
   }
 }

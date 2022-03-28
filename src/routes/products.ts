@@ -1,17 +1,12 @@
 import { Router } from "express";
-const router = Router()
-import products  from "../controllers/products"
+import { getAllProducts, addProduct } from "../controllers/products";
+import { authToken, isAdmin } from "../middlewares/auth";
+const router = Router();
 
-router.get("/api/product",products.getAllProducts)
+//get all products
+router.get("/api/products", getAllProducts);
 
-interface Product {
-    id:number,
-    name:string,
-    price:number,
-    description:string,
-    stock:number,
-    brand:string,
-    color: string[]
-}
+//add new product
+router.post("/api/products", authToken, isAdmin, addProduct);
 
-export default router
+export default router;

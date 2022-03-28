@@ -4,14 +4,15 @@ CREATE TABLE product(
     productID INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR (40) NOT NULL,
     price DOUBLE NOT NULL,
-    description VARCHAR(300) NOT NULL,
     stock INTEGER(6) NOT NULL,
     brand VARCHAR(25) NOT NULL,
-    color JSON
+    colors JSON,
+    rating
 );
 
 CREATE TABLE user(
     userID INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(50) UNIQUE NOT NULL,
-    pwd VARCHAR(80) NOT NULL
+    pwd VARCHAR(80) NOT NULL,
+    isAdmin BOOLEAN DEFAULT 0
 );
