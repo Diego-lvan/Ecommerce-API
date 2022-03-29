@@ -31,9 +31,10 @@ const addProduct = async (req: Request, res: Response) => {
 };
 
 const addImg = (req: Request, res: Response) => {
-  const path = req.file?.path;
-  if (!path) return res.json({ success: false });
-  pool.query("UPDATE product SET img = ?", [path]);
+  const path: string | undefined = req.file?.path;
+  const productID: number = req.body.productID;
+  if (!path || !productID) return res.json({ success: false });
+  pool.query("UPDATE product SET img = ? WHERE productID = ? ", [path, productID]);
   res.json({ success: true });
 };
 
