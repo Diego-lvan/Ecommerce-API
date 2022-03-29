@@ -2,12 +2,13 @@ import { Request, Response } from "express";
 import pool from "../config/conn";
 
 interface Product {
-  id: number;
+  id?: number;
   name: string;
-  price: number;
-  stock: number;
+  price: string;
+  stock: string;
   brand: string;
   colors: string[];
+  rating?: number;
 }
 
 const getAllProducts = async (req: Request, res: Response) => {
@@ -16,8 +17,18 @@ const getAllProducts = async (req: Request, res: Response) => {
 };
 
 const addProduct = async (req: Request, res: Response) => {
-  console.log("i pass");
-  res.json("you are an admin ");
+  let product: Product = req.body;
+  console.log(req.body);
+  const sql: string = `INSERT INTO product (name,price,stock,brand,colors,img) VALUES (?,?,?,?,?,?)`;
+  await pool.query(sql, [
+    product.name,
+    parseFloat(product.price),
+    parseInt(product.stock),
+    product.brand,
+    product.colors,
+    req.file?.path,
+  ]);
+  res.json(product);
 };
 
 export { getAllProducts, addProduct };

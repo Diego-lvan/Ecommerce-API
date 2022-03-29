@@ -7,7 +7,7 @@ CREATE TABLE product(
     stock INTEGER(6) NOT NULL,
     brand VARCHAR(25) NOT NULL,
     colors JSON,
-    rating
+    rating FLOAT(4)
 );
 
 CREATE TABLE user(

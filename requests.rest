@@ -19,6 +19,17 @@ Content-Type: application/json
 ### Get all products
 GET http://localhost:5003/api/products
 
-### Create Product raw
+### Create Product form-data
 POST http://localhost:5003/api/products
 Authorization: bearer eyJhbGciOiJIUzI1NiJ9.ZGllZ29AZ21haWwuY29t.K_9gnp8eB5Q4YFkOPYfjpOsG7qBZKPFzQo-yfnkvi-M
+Content-Type: application/json
+
+{
+    "name":"Iphone 13 Max",
+    "price":1200,
+    "stock":20,
+    "brand":"Apple",
+    "colors":["pink","black"],
+    "img":"YOUR IMAGE"
+ 
+}
