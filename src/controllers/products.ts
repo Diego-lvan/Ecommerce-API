@@ -4,10 +4,9 @@ import pool from "../config/conn";
 interface Product {
   id?: number;
   name: string;
-  price: string;
-  stock: string;
+  price: number;
+  stock: number;
   brand: string;
-  colors: string[];
   rating?: number;
 }
 
@@ -25,17 +24,17 @@ const getProductByID = async (req: Request, res: Response) => {
 
 const addProduct = async (req: Request, res: Response) => {
   let product: Product = req.body;
-  console.log(req.body);
-  const sql: string = `INSERT INTO product (name,price,stock,brand,colors,img) VALUES (?,?,?,?,?,?)`;
-  await pool.query(sql, [
-    product.name,
-    parseFloat(product.price),
-    parseInt(product.stock),
-    product.brand,
-    product.colors,
-    req.file?.path,
-  ]);
+  const sql: string = `INSERT INTO product (name,price,stock,brand) VALUES (?,?,?,?)`;
+
+  await pool.query(sql, Object.values(product));
   res.json(product);
 };
 
-export { getAllProducts, addProduct, getProductByID };
+const addImg = (req: Request, res: Response) => {
+  const path = req.file?.path;
+  if (!path) return res.json({ success: false });
+  pool.query("UPDATE product SET img = ?", [path]);
+  res.json({ success: true });
+};
+
+export { getAllProducts, addProduct, getProductByID, addImg };
