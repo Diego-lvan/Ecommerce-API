@@ -16,6 +16,13 @@ const getAllProducts = async (req: Request, res: Response) => {
   res.json({ products });
 };
 
+const getProductByID = async (req: Request, res: Response) => {
+  const { productID } = req.params;
+  const sql = "SELECT * FROM product WHERE productID = ?";
+  const [[product]]: any = await pool.query(sql, [productID]);
+  res.json(product);
+};
+
 const addProduct = async (req: Request, res: Response) => {
   let product: Product = req.body;
   console.log(req.body);
@@ -31,4 +38,4 @@ const addProduct = async (req: Request, res: Response) => {
   res.json(product);
 };
 
-export { getAllProducts, addProduct };
+export { getAllProducts, addProduct, getProductByID };
