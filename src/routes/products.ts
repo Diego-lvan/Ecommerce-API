@@ -1,6 +1,5 @@
 import { Router } from "express";
 import {
-  getProducts,
   addProduct,
   getProductByID,
   updateImage,
@@ -12,7 +11,7 @@ import upload from "../middlewares/uploadFile";
 const router = Router();
 
 //get products
-router.get("/api/product", pagination("productID", "product"), getProducts);
+router.get("/api/product", pagination("productID", "product"));
 
 // get products by id
 router.get("/api/product/:productID", getProductByID);
