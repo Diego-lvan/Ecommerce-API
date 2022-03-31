@@ -6,7 +6,7 @@ const pagination = (PK: string, table: string) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     let { limit, page }: any = req.query;
     limit = isNaN(parseInt(limit)) ? 10 : parseInt(limit);
-    page = isNaN(parseInt(page)) ? 1 : parseInt(page) - 1;
+    page = isNaN(parseInt(page)) ? 0 : parseInt(page) - 1;
     const start: number = page * limit;
     const sql: string = `SELECT COUNT(${PK}) AS countRows FROM ${table}`;
     const [[{ countRows }]]: any = await pool.query(sql);
