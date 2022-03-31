@@ -10,7 +10,7 @@ interface Product {
   rating?: number;
 }
 
-const getAllProducts = async (req: Request, res: Response) => {
+const getProducts = async (req: Request, res: Response) => {
   try {
     res.json({ info: res.info, results: res.results });
   } catch (error) {
@@ -41,4 +41,4 @@ const addImg = (req: Request, res: Response) => {
   res.json({ success: true });
 };
 
-export { getAllProducts, addProduct, getProductByID, addImg };
+export { getProducts, addProduct, getProductByID, addImg };
