@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import pool from "../config/conn";
-
+import { unlink } from "fs/promises";
 interface Product {
   id?: number;
   name: string;
@@ -33,12 +33,15 @@ const addProduct = async (req: Request, res: Response) => {
   res.json(product);
 };
 
-const addImg = (req: Request, res: Response) => {
+const updateImage = async (req: Request, res: Response) => {
   const path: string | undefined = req.file?.filename;
   const productID: number = req.body.productID;
   if (!path || !productID) return res.json({ success: false });
-  pool.query("UPDATE product SET img = ? WHERE productID = ? ", [path, productID]);
+  const sql = "SELECT img FROM product WHERE productID = ?";
+  const [[{ img }]]: any = await pool.query(sql, [productID]);
+  if (img !== "not-found.png") unlink(`upload/${img}`);
+  await pool.query("UPDATE product SET img = ? WHERE productID = ? ", [path, productID]);
   res.json({ success: true });
 };
 
-export { getProducts, addProduct, getProductByID, addImg };
+export { getProducts, addProduct, getProductByID, updateImage };
