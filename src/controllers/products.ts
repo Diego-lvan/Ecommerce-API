@@ -11,8 +11,11 @@ interface Product {
 }
 
 const getAllProducts = async (req: Request, res: Response) => {
-  const [products] = await pool.query("SELECT * FROM product");
-  res.json({ products });
+  try {
+    res.json({ info: res.info, results: res.results });
+  } catch (error) {
+    res.status(500).json({ error });
+  }
 };
 
 const getProductByID = async (req: Request, res: Response) => {
@@ -31,7 +34,7 @@ const addProduct = async (req: Request, res: Response) => {
 };
 
 const addImg = (req: Request, res: Response) => {
-  const path: string | undefined = req.file?.path;
+  const path: string | undefined = req.file?.filename;
   const productID: number = req.body.productID;
   if (!path || !productID) return res.json({ success: false });
   pool.query("UPDATE product SET img = ? WHERE productID = ? ", [path, productID]);

@@ -1,11 +1,12 @@
 import { Router } from "express";
 import { getAllProducts, addProduct, getProductByID, addImg } from "../controllers/products";
 import { authToken, isAdmin } from "../middlewares/auth";
+import pagination from "../middlewares/pagination";
 import upload from "../middlewares/uploadFile";
 const router = Router();
 
 //get all products
-router.get("/api/products", getAllProducts);
+router.get("/api/products", pagination("productID", "product"), getAllProducts);
 
 // get products by id
 router.get("/api/products/:productID", getProductByID);
