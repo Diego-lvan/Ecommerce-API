@@ -44,4 +44,10 @@ const updateImage = async (req: Request, res: Response) => {
   res.json({ success: true });
 };
 
-export { getProducts, addProduct, getProductByID, updateImage };
+const updateProduct = async (req: Request, res: Response) => {
+  const { productID, name, price, stock, brand } = req.body;
+  const sql = "UPDATE product SET name = ?, price=?,stock=?,brand=? WHERE productID = ?";
+  await pool.query(sql, [name, price, stock, brand, productID]);
+  res.json({ success: true });
+};
+export { getProducts, addProduct, getProductByID, updateImage, updateProduct };

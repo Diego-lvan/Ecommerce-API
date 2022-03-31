@@ -1,5 +1,11 @@
 import { Router } from "express";
-import { getProducts, addProduct, getProductByID, updateImage } from "../controllers/products";
+import {
+  getProducts,
+  addProduct,
+  getProductByID,
+  updateImage,
+  updateProduct,
+} from "../controllers/products";
 import { authToken, isAdmin } from "../middlewares/auth";
 import pagination from "../middlewares/pagination";
 import upload from "../middlewares/uploadFile";
@@ -14,6 +20,10 @@ router.get("/api/product/:productID", getProductByID);
 //add new product
 router.post("/api/product", authToken, isAdmin, addProduct);
 
+//upload image
 router.post("/api/product/uploadImg", authToken, isAdmin, upload.single("img"), updateImage);
+
+//update product
+router.put("/api/product", updateProduct);
 
 export default router;
