@@ -10,14 +10,6 @@ interface Product {
   rating?: number;
 }
 
-const getProducts = async (req: Request, res: Response) => {
-  try {
-    res.json({ info: res.info, results: res.results });
-  } catch (error) {
-    res.status(500).json({ error });
-  }
-};
-
 const getProductByID = async (req: Request, res: Response) => {
   const { productID } = req.params;
   const sql = "SELECT * FROM product WHERE productID = ?";
@@ -50,4 +42,14 @@ const updateProduct = async (req: Request, res: Response) => {
   await pool.query(sql, [name, price, stock, brand, productID]);
   res.json({ success: true });
 };
-export { getProducts, addProduct, getProductByID, updateImage, updateProduct };
+
+const deleteProduct = async (req: Request, res: Response) => {
+  const productID = req.params?.productID;
+  const sql = "SELECT img FROM product WHERE productID = ?";
+  const [[data]]: any = await pool.query(sql, [productID]);
+  if (data?.img !== "not-found.png") unlink(`upload/${data?.img}`);
+  await pool.query("DELETE FROM product WHERE productID = ?", [productID]);
+  res.json({ success: true });
+};
+
+export { addProduct, getProductByID, updateImage, updateProduct, deleteProduct };

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   addProduct,
+  deleteProduct,
   getProductByID,
   updateImage,
   updateProduct,
@@ -25,4 +26,6 @@ router.post("/api/product/uploadImg", authToken, isAdmin, upload.single("img"), 
 //update product
 router.put("/api/product", updateProduct);
 
+//delete prodcut
+router.delete("/api/product/:productID", deleteProduct);
 export default router;
