@@ -3,16 +3,16 @@ import {
   addProduct,
   deleteProduct,
   getProductByID,
+  paginationProducts,
   updateImage,
   updateProduct,
 } from "../controllers/products";
 import { authToken, isAdmin } from "../middlewares/auth";
-import pagination from "../middlewares/pagination";
 import upload from "../middlewares/uploadFile";
 const router = Router();
 
 //get products
-router.get("/api/product", pagination("productID", "product"));
+router.get("/api/product", paginationProducts);
 
 // get products by id
 router.get("/api/product/:productID", getProductByID);

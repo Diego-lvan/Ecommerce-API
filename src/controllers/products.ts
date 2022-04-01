@@ -1,4 +1,5 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
+import "dotenv/config";
 import pool from "../config/conn";
 import { unlink } from "fs/promises";
 interface Product {
@@ -9,6 +10,34 @@ interface Product {
   brand: string;
   rating?: number;
 }
+
+const orderBy = ["brand", "price", "stock", "name", "rating"];
+
+const paginationProducts = async (req: Request, res: Response, next: NextFunction) => {
+  const URL: string = process.env.URL;
+  let { limit, page, maxPrice, brand, order }: any = req.query;
+  limit = isNaN(parseInt(limit)) ? 10 : parseInt(limit);
+  page = isNaN(parseInt(page)) ? 0 : parseInt(page) - 1;
+  maxPrice = isNaN(parseFloat(maxPrice)) ? 10000 : parseInt(maxPrice);
+  brand = brand ?? "";
+  order = orderBy.includes(order) ? order : "productID";
+
+  const start: number = page * limit;
+  const sqlCount: string = `SELECT COUNT(productID) AS countRows FROM product WHERE price <= ? AND brand LIKE '%${brand}%' `;
+  const [[{ countRows }]]: any = await pool.query(sqlCount, [maxPrice]);
+  const totalPages: number = Math.ceil(countRows / limit);
+  if (countRows === 0) return res.json({ error: "There is nothing here" });
+  console.log(order);
+  const sqlFilter = `SELECT * FROM  product WHERE price <= ? AND brand LIKE '%${brand}%' ORDER BY ${order} LIMIT ?,? `;
+  const [results] = await pool.query(sqlFilter, [maxPrice, start, limit]);
+  const info = {
+    prev: page === 0 ? null : `${URL}/product?page=${page}&limit=${limit}`,
+    count: limit,
+    pages: totalPages,
+    next: page + 2 > totalPages ? null : `${URL}/product?page=${page + 2}&limit=${limit}`,
+  };
+  res.json({ info, results });
+};
 
 const getProductByID = async (req: Request, res: Response) => {
   const { productID } = req.params;
@@ -52,4 +81,11 @@ const deleteProduct = async (req: Request, res: Response) => {
   res.json({ success: true });
 };
 
-export { addProduct, getProductByID, updateImage, updateProduct, deleteProduct };
+export {
+  addProduct,
+  getProductByID,
+  updateImage,
+  updateProduct,
+  deleteProduct,
+  paginationProducts,
+};
