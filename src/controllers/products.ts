@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import "dotenv/config";
+
 import pool from "../config/conn";
 import { unlink } from "fs/promises";
+import getInfo from "../utils/getInfo";
 interface Product {
   id?: number;
   name: string;
@@ -14,7 +15,6 @@ interface Product {
 const orderBy = ["brand", "price", "stock", "name", "rating"];
 
 const paginationProducts = async (req: Request, res: Response, next: NextFunction) => {
-  const URL: string = process.env.URL;
   let { limit, page, maxPrice, brand, order }: any = req.query;
   limit = isNaN(parseInt(limit)) ? 10 : parseInt(limit);
   page = isNaN(parseInt(page)) ? 0 : parseInt(page) - 1;
@@ -27,15 +27,9 @@ const paginationProducts = async (req: Request, res: Response, next: NextFunctio
   const [[{ countRows }]]: any = await pool.query(sqlCount, [maxPrice]);
   const totalPages: number = Math.ceil(countRows / limit);
   if (countRows === 0) return res.json({ error: "There is nothing here" });
-  console.log(order);
   const sqlFilter = `SELECT * FROM  product WHERE price <= ? AND brand LIKE '%${brand}%' ORDER BY ${order} LIMIT ?,? `;
   const [results] = await pool.query(sqlFilter, [maxPrice, start, limit]);
-  const info = {
-    prev: page === 0 ? null : `${URL}/product?page=${page}&limit=${limit}`,
-    count: limit,
-    pages: totalPages,
-    next: page + 2 > totalPages ? null : `${URL}/product?page=${page + 2}&limit=${limit}`,
-  };
+  const info = getInfo(page, limit, totalPages, countRows, [{ maxPrice }, { brand }, { order }], "product");
   res.json({ info, results });
 };
 
@@ -81,11 +75,4 @@ const deleteProduct = async (req: Request, res: Response) => {
   res.json({ success: true });
 };
 
-export {
-  addProduct,
-  getProductByID,
-  updateImage,
-  updateProduct,
-  deleteProduct,
-  paginationProducts,
-};
+export { addProduct, getProductByID, updateImage, updateProduct, deleteProduct, paginationProducts };
