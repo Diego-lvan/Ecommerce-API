@@ -6,7 +6,6 @@ CREATE TABLE product(
     price DOUBLE NOT NULL,
     stock INTEGER(6) NOT NULL,
     brand VARCHAR(25) NOT NULL,
-    colors JSON,
     rating FLOAT(4)
 );
 
@@ -16,3 +15,14 @@ CREATE TABLE user(
     pwd VARCHAR(80) NOT NULL,
     isAdmin BOOLEAN DEFAULT 0
 );
+
+CREATE TABLE sale(
+    orderID INT AUTO_INCREMENT PRIMARY KEY,
+    productID INT NOT NULL,
+    userID INT NOT NULL,
+    amount INT NOT NULL,
+    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
+    delivered BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (productID) REFERENCES product(productID),
+    FOREIGN KEY (userID) REFERENCES user(userID)
+    );

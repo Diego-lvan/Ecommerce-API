@@ -9,8 +9,8 @@ export interface User {
 }
 
 const loginUser = (req: Request, res: Response) => {
-  const email: string = req.body.email;
-  const accessToken = jwt.sign(email, process.env.ACCESS_TOKEN_SECRET!);
+  const userID: string = req.exists.userID;
+  const accessToken = jwt.sign(userID, process.env.ACCESS_TOKEN_SECRET!);
   res.json({ accessToken });
 };
 

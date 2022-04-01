@@ -1,4 +1,4 @@
 import authRouter from "./auth";
 import productsRouter from "./products";
-
-export { authRouter, productsRouter };
+import salesRouter from "./sales";
+export { authRouter, productsRouter, salesRouter };
