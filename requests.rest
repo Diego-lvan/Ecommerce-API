@@ -8,7 +8,7 @@ Content-Type: application/json
 }
 
 ###Login user raw
-POST https://e-commerce-api-diego.herokuapp.com/api/auth/login
+POST http://localhost:5006/api/auth/login
 Content-Type: application/json
 
 {
@@ -20,15 +20,14 @@ Content-Type: application/json
 GET http://localhost:5003/api/products
 
 ### Create Product form-data
-POST https://e-commerce-api-diego.herokuapp.com/api/products
-Authorization: bearer eyJhbGciOiJIUzI1NiJ9.ZGllZ29AZ21haWwuY29t.K_9gnp8eB5Q4YFkOPYfjpOsG7qBZKPFzQo-yfnkvi-M
+POST http://localhost:5006/api/product
+Authorization: bearer eyJhbGciOiJIUzI1NiJ9.MQ.h8xdF-oMjh4XqCjG06OLIHeKLZts8xQob_scZDPXxpE
 Content-Type: application/json
 
 {
     "name":"Iphone 130 Max",
-    "price":1200,
+    "price":12020,
     "stock":20,
-    "brand":"Apple",
-    "colors":["pink","black"]
+    "brand":"Apple"
  
 }

@@ -24,8 +24,8 @@ router.post("/api/product", authToken, isAdmin, addProduct);
 router.post("/api/product/uploadImg", authToken, isAdmin, upload.single("img"), updateImage);
 
 //update product
-router.put("/api/product", updateProduct);
+router.put("/api/product", authToken, isAdmin, updateProduct);
 
 //delete prodcut
-router.delete("/api/product/:productID", deleteProduct);
+router.delete("/api/product/:productID", authToken, isAdmin, deleteProduct);
 export default router;
