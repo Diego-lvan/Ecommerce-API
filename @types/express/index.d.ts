@@ -6,6 +6,7 @@ declare global {
       userID: number;
       exists: User;
       isAdmin: boolean;
+      email: string;
     }
     export interface Response {
       results: any;

@@ -9,6 +9,7 @@ declare global {
       ACCESS_TOKEN_SECRET: string;
       URL: string;
       STRIPE_PRIVATE_KEY: string;
+      STRIPE_ENDPOINT_SECRET: string;
     }
   }
 }
