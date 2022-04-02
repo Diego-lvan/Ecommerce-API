@@ -8,6 +8,7 @@ declare global {
       DB_NAME: string;
       ACCESS_TOKEN_SECRET: string;
       URL: string;
+      STRIPE_PRIVATE_KEY: string;
     }
   }
 }
