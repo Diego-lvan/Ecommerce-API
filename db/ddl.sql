@@ -17,14 +17,22 @@ CREATE TABLE user(
 );
 
 CREATE TABLE sale(
-    orderID INT PRIMARY KEY AUTO_INCREMENT,
-    checkout VARCHAR(80) NOT NULL,
-    productID INT NOT NULL,
+    saleID VARCHAR(80) PRIMARY KEY,
     userID INT NOT NULL,
-    amount INT NOT NULL,
+    totalPrice FLOAT NOT NULL,
     date TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
     delivered BOOLEAN DEFAULT FALSE,
     succeded BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (productID) REFERENCES product(productID),
     FOREIGN KEY (userID) REFERENCES user(userID)
     );
+
+CREATE TABLE saleInfo(
+    productID INT NOT NULL,
+    saleID VARCHAR(80) NOT NULL,
+    quantity INT NOT NULL,
+    subTotal FLOAT NOT NULL,
+    PRIMARY KEY (productID,saleID),
+    FOREIGN KEY (productID) REFERENCES product(productID),
+    FOREIGN KEY (saleID) REFERENCES sale(saleID)
+);

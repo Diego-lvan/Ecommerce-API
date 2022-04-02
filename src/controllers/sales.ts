@@ -35,15 +35,22 @@ const createStripeSession = async (req: Request, res: Response) => {
         };
       }),
     });
-    const checkout = session.id;
-    const purchsesStr = purchases
-      .map((purchase: purchase) => `('${checkout}',${purchase.productID},${1},${purchase.quantity})`)
-      .join(", ");
-    await pool.query(`INSERT INTO sale (checkout,productID,userID,amount) VALUES ${purchsesStr}`);
+    const saleID = session.id;
+    await insertSale(purchases, saleID, session.amount_total!);
     res.json({ url: session.url });
   } catch (error) {
     res.status(500).json(error);
   }
+};
+
+const insertSale = async (purchases: purchase[], saleID: string, totalPrice: number) => {
+  const salesInfo = purchases
+    .map(
+      (purchase: purchase) => `('${saleID}',${purchase.productID},${purchase.quantity},${purchase.price! * purchase.quantity}) `
+    )
+    .join(", ");
+  await pool.query(`INSERT INTO sale (saleID,userID,totalPrice) VALUES (?,?,?)`, [saleID, 1, totalPrice]);
+  await pool.query(`INSERT INTO saleInfo (saleID, productID,quantity,subtotal) VALUES ${salesInfo} `);
 };
 
 const handleWebHook = async (req: Request, res: Response, next: NextFunction) => {
@@ -52,15 +59,15 @@ const handleWebHook = async (req: Request, res: Response, next: NextFunction) =>
   let event;
   try {
     event = stripe.webhooks.constructEvent(payloadString, header, process.env.STRIPE_ENDPOINT_SECRET);
+    if (event.type === "checkout.session.completed") {
+      const data: any = event.data.object;
+      const saleID = data.id;
+      await pool.query("UPDATE sale SET succeded = true WHERE saleID = ?", [saleID]);
+      res.send();
+    }
   } catch (e: any) {
     return res.status(400).send(`Webhook Error: ${e.message}`);
   }
-  if (event.type === "checkout.session.completed") {
-    const data: any = event.data.object;
-    const checkout = data.id;
-    await pool.query("UPDATE sale SET succeded = true WHERE checkout = ?", [checkout]);
-  }
-  res.send();
 };
 
 export { createStripeSession, handleWebHook };
