@@ -13,7 +13,7 @@ interface purchase {
 const createStripeSession = async (req: Request, res: Response) => {
   let { successURL, cancelURL, purchases }: { successURL: string; cancelURL: string; purchases: any } = req.body;
   try {
-    const userID = req.userID;
+    const userID: number = req.userID;
     const IDs = purchases.map((purchase: purchase) => purchase.productID).join(",");
     const [[{ email }]]: any = await pool.query("SELECT email FROM user WHERE userID = ?", [userID]);
     const [data]: any = await pool.query(`SELECT price,name FROM product WHERE productID IN (${IDs})`);
@@ -38,20 +38,20 @@ const createStripeSession = async (req: Request, res: Response) => {
       }),
     });
     const saleID: string = session.id;
-    await insertSale(purchases, saleID, session.amount_total!);
+    await insertSale(purchases, saleID, session.amount_total!, userID);
     res.json({ url: session.url });
   } catch (error) {
     res.status(500).json(error);
   }
 };
 
-const insertSale = async (purchases: purchase[], saleID: string, totalPrice: number) => {
+const insertSale = async (purchases: purchase[], saleID: string, totalPrice: number, userID: number) => {
   const salesInfo = purchases
     .map(
       (purchase: purchase) => `('${saleID}',${purchase.productID},${purchase.quantity},${purchase.price! * purchase.quantity}) `
     )
     .join(", ");
-  await pool.query(`INSERT INTO sale (saleID,userID,totalPrice) VALUES (?,?,?)`, [saleID, 1, totalPrice]);
+  await pool.query(`INSERT INTO sale (saleID,userID,totalPrice) VALUES (?,?,?)`, [saleID, userID, totalPrice]);
   await pool.query(`INSERT INTO saleInfo (saleID, productID,quantity,subtotal) VALUES ${salesInfo} `);
 };
 
