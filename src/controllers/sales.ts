@@ -11,13 +11,15 @@ interface purchase {
 }
 
 const createStripeSession = async (req: Request, res: Response) => {
-  let { successURL, cancelURL, purchases } = req.body;
+  let { successURL, cancelURL, purchases }: { successURL: string; cancelURL: string; purchases: any } = req.body;
   try {
-    const IDs = purchases.map((purchase: purchase) => purchase.productID || null).join(",");
+    const userID = req.userID;
+    const IDs = purchases.map((purchase: purchase) => purchase.productID).join(",");
+    const [[{ email }]]: any = await pool.query("SELECT email FROM user WHERE userID = ?", [userID]);
     const [data]: any = await pool.query(`SELECT price,name FROM product WHERE productID IN (${IDs})`);
     purchases = purchases.map((purchase: purchase, i: number) => ({ price: data[i].price, name: data[i].name, ...purchase }));
     const session = await stripe.checkout.sessions.create({
-      customer_email: "diego@gmail.com",
+      customer_email: email,
       payment_method_types: ["card"],
       mode: "payment",
       success_url: successURL,
@@ -35,7 +37,7 @@ const createStripeSession = async (req: Request, res: Response) => {
         };
       }),
     });
-    const saleID = session.id;
+    const saleID: string = session.id;
     await insertSale(purchases, saleID, session.amount_total!);
     res.json({ url: session.url });
   } catch (error) {
@@ -54,14 +56,16 @@ const insertSale = async (purchases: purchase[], saleID: string, totalPrice: num
 };
 
 const handleWebHook = async (req: Request, res: Response, next: NextFunction) => {
-  const payloadString = JSON.stringify(req.body, null, 2);
-  const header = stripe.webhooks.generateTestHeaderString({ payload: payloadString, secret: process.env.STRIPE_ENDPOINT_SECRET });
-  let event;
   try {
-    event = stripe.webhooks.constructEvent(payloadString, header, process.env.STRIPE_ENDPOINT_SECRET);
+    const payloadString: string = JSON.stringify(req.body, null, 2);
+    const header: string = stripe.webhooks.generateTestHeaderString({
+      payload: payloadString,
+      secret: process.env.STRIPE_ENDPOINT_SECRET,
+    });
+    let event = await stripe.webhooks.constructEvent(payloadString, header, process.env.STRIPE_ENDPOINT_SECRET);
     if (event.type === "checkout.session.completed") {
       const data: any = event.data.object;
-      const saleID = data.id;
+      const saleID: string = data.id;
       await pool.query("UPDATE sale SET succeded = true WHERE saleID = ?", [saleID]);
       res.send();
     }
