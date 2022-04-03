@@ -3,53 +3,59 @@ import "dotenv/config";
 import Stripe from "stripe";
 import pool from "../config/conn";
 const stripe = new Stripe(process.env.STRIPE_PRIVATE_KEY!, { apiVersion: "2020-08-27" });
-interface purchase {
+interface saleInfo {
   productID: number;
   quantity: number;
   price?: number;
   name?: string;
+  subtotal?: number;
+}
+
+interface sale {
+  date: string;
+  delivered: boolean;
+  totalPrice: number;
+  userID: number;
 }
 
 const createStripeSession = async (req: Request, res: Response) => {
-  let { successURL, cancelURL, purchases }: { successURL: string; cancelURL: string; purchases: any } = req.body;
+  let { successURL, cancelURL, sales }: { successURL: string; cancelURL: string; sales: any } = req.body;
   try {
     const userID: number = req.userID;
-    const IDs = purchases.map((purchase: purchase) => purchase.productID).join(",");
+    const IDs = sales.map((sale: saleInfo) => sale.productID).join(",");
     const [[{ email }]]: any = await pool.query("SELECT email FROM user WHERE userID = ?", [userID]);
     const [data]: any = await pool.query(`SELECT price,name FROM product WHERE productID IN (${IDs})`);
-    purchases = purchases.map((purchase: purchase, i: number) => ({ price: data[i].price, name: data[i].name, ...purchase }));
+    sales = sales.map((sale: saleInfo, i: number) => ({ price: data[i].price, name: data[i].name, ...sale }));
     const session = await stripe.checkout.sessions.create({
       customer_email: email,
       payment_method_types: ["card"],
       mode: "payment",
       success_url: successURL,
       cancel_url: cancelURL,
-      line_items: purchases.map((purchase: purchase) => {
+      line_items: sales.map((sale: saleInfo) => {
         return {
           price_data: {
             currency: "usd",
             product_data: {
-              name: purchase.name,
+              name: sale.name,
             },
-            unit_amount: purchase.price,
+            unit_amount: sale.price,
           },
-          quantity: purchase.quantity,
+          quantity: sale.quantity,
         };
       }),
     });
     const saleID: string = session.id;
-    await insertSale(purchases, saleID, session.amount_total!, userID);
+    await insertSale(sales, saleID, session.amount_total!, userID);
     res.json({ url: session.url });
   } catch (error) {
     res.status(500).json(error);
   }
 };
 
-const insertSale = async (purchases: purchase[], saleID: string, totalPrice: number, userID: number) => {
-  const salesInfo = purchases
-    .map(
-      (purchase: purchase) => `('${saleID}',${purchase.productID},${purchase.quantity},${purchase.price! * purchase.quantity}) `
-    )
+const insertSale = async (sales: saleInfo[], saleID: string, totalPrice: number, userID: number) => {
+  const salesInfo = sales
+    .map((sale: saleInfo) => `('${saleID}',${sale.productID},${sale.quantity},${sale.price! * sale.quantity}) `)
     .join(", ");
   await pool.query(`INSERT INTO sale (saleID,userID,totalPrice) VALUES (?,?,?)`, [saleID, userID, totalPrice]);
   await pool.query(`INSERT INTO saleInfo (saleID, productID,quantity,subtotal) VALUES ${salesInfo} `);
@@ -74,4 +80,15 @@ const handleWebHook = async (req: Request, res: Response, next: NextFunction) =>
   }
 };
 
-export { createStripeSession, handleWebHook };
+const getSingleSale = async (req: Request, res: Response) => {
+  const saleID: string = req.params.saleID;
+  const sql = "CALL getSaleByID(?)";
+  const [data]: any = await pool.query(sql, [saleID]);
+  if (data[0].length === 0) return res.json({ error: "There is nothing here" });
+  const sale: sale = data[0][0];
+  const saleInfo: saleInfo = data[1];
+  sale.delivered = sale.delivered ? true : false;
+  res.json({ sale: data[0][0], saleInfo });
+};
+
+export { createStripeSession, handleWebHook, getSingleSale };
