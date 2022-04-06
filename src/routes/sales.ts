@@ -1,5 +1,5 @@
 import express from "express";
-import { handleWebHook, createStripeSession, getSingleSale } from "../controllers/sales";
+import { handleWebHook, createStripeSession, getSingleSale, getSales } from "../controllers/sales";
 import { authToken } from "../middlewares/auth";
 const router = express.Router();
 
@@ -11,5 +11,8 @@ router.post("/webhook", handleWebHook);
 
 //get single sale
 router.get("/api/sale/:saleID", getSingleSale);
+
+//get sales
+router.get("/api/sale", getSales);
 
 export default router;
