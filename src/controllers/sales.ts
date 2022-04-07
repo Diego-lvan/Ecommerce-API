@@ -102,4 +102,11 @@ const getSales = async (req: Request, res: Response) => {
   res.json({ sales: data });
 };
 
-export { createStripeSession, handleWebHook, getSingleSale, getSales };
+const getMySales = async (req: Request, res: Response) => {
+  const userID: number = req.userID;
+  const sql = "CALL getSales(NULL,?,NULL,NULL,NULL,NULL,NULL)";
+  const [[data]]: any = await pool.query(sql, userID);
+  res.json({ sales: data });
+};
+
+export { createStripeSession, handleWebHook, getSingleSale, getSales, getMySales };

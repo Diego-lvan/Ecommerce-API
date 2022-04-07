@@ -11,7 +11,7 @@ const authToken = async (req: Request, res: Response, next: NextFunction) => {
   if (!token) return res.status(401).json({ msg: "unauthorized" });
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!, (err: any, userID: any) => {
     if (err) return res.status(401).json({ msg: "unauthorized" });
-    req.userID = userID;
+    req.userID = parseInt(userID);
     next();
   });
 };
