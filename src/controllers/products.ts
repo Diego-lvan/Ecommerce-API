@@ -18,17 +18,15 @@ const paginationProducts = async (req: Request, res: Response, next: NextFunctio
   let { limit, page, maxPrice, brand, order }: any = req.query;
   limit = isNaN(parseInt(limit)) ? 10 : parseInt(limit);
   page = isNaN(parseInt(page)) ? 0 : parseInt(page) - 1;
-  maxPrice = isNaN(parseFloat(maxPrice)) ? 10000 : parseInt(maxPrice);
-  brand = brand ?? "";
+  maxPrice = isNaN(parseFloat(maxPrice)) ? null : parseInt(maxPrice);
+  brand = brand ?? null;
   order = orderBy.includes(order) ? order : "productID";
 
   const start: number = page * limit;
-  const sqlCount: string = `SELECT COUNT(productID) AS countRows FROM product WHERE price <= ? AND brand LIKE '%${brand}%' AND stock > 0 `;
-  const [[{ countRows }]]: any = await pool.query(sqlCount, [maxPrice]);
+  const [[[{ countRows }]]]: any = await pool.query("CALL countProducts(?,?)", [maxPrice, brand]);
   const totalPages: number = Math.ceil(countRows / limit);
   if (countRows === 0) return res.json({ error: "There is nothing here" });
-  const sqlFilter = `SELECT * FROM  product WHERE price <= ? AND brand LIKE '%${brand}%' AND stock > 0 ORDER BY ${order} LIMIT ?,? `;
-  const [results] = await pool.query(sqlFilter, [maxPrice, start, limit]);
+  const [[results]]: any = await pool.query("CALL paginationFilterProducts(?,?,?,?,?)", [maxPrice, start, limit, brand, order]);
   const info = getInfo(page, limit, totalPages, countRows, [{ maxPrice }, { brand }, { order }], "product");
   res.json({ info, results });
 };
