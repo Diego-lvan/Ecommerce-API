@@ -29,3 +29,15 @@ CREATE TABLE sale(
     FOREIGN KEY (productID) REFERENCES product(productID),
     FOREIGN KEY (userID) REFERENCES user(userID)
     );
+
+CREATE TABLE review(
+    productID INT,
+    userID INT,
+    title VARCHAR(20) NOT NULL,
+    review VARCHAR(300) NOT NULL,
+    rate INT NOT NULL,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP() NOT NULL,
+    PRIMARY KEY (userID,productID),
+    FOREIGN KEY (productID) REFERENCES product(productID),
+    FOREIGN KEY (userID) REFERENCES user(userID)
+);
