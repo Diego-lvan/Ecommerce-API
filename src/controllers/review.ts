@@ -13,4 +13,15 @@ const addReview = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export { addReview };
+const deleteReview = async (req: Request, res: Response) => {
+  try {
+    const userID: number = req.userID;
+    const productID: number = parseInt(req.params.productID);
+    await pool.query("DELETE FROM review WHERE userID = ? AND productID = ?", [userID, productID]);
+    res.json({ success: true });
+  } catch (error) {
+    res.json({ error });
+  }
+};
+
+export { addReview, deleteReview };
