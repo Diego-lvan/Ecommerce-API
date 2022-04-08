@@ -24,4 +24,18 @@ const deleteReview = async (req: Request, res: Response) => {
   }
 };
 
-export { addReview, deleteReview };
+const getReviews = async (req: Request, res: Response) => {
+  try {
+    const productID: number = parseInt(req.params.productID);
+    console.log(productID);
+    const sql = `SELECT u.userID, u.email, r.title, r.review, r.rate, r.createdAt 
+                FROM review r INNER JOIN user u ON u.userID = r.userID WHERE r.productID = ?`;
+    const [data]: any = await pool.query(sql, [productID]);
+    console.log(data);
+    res.json({ reviews: data });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export { addReview, deleteReview, getReviews };
