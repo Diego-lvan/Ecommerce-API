@@ -37,6 +37,7 @@ CREATE TABLE review(
     review VARCHAR(300) NOT NULL,
     rate INT NOT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP() NOT NULL,
+    updatedAt TIMESTAMP NULL,
     PRIMARY KEY (userID,productID),
     FOREIGN KEY (productID) REFERENCES product(productID),
     FOREIGN KEY (userID) REFERENCES user(userID)
