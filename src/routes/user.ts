@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getCurrentUser, getUserByID, updatePwd, updateUser } from "../controllers/user";
+import { forgotPassword, getCurrentUser, getUserByID, resetPassword, updatePwd, updateUser } from "../controllers/user";
 import { authToken, isAdmin } from "../middlewares/auth";
 const router = Router();
 
@@ -14,5 +14,11 @@ router.put("/api/user/updateUser", authToken, updateUser);
 
 //update user password
 router.patch("/api/user/updatePwd", authToken, updatePwd);
+
+//forgot password
+router.post("/api/user/forgotPassword", forgotPassword);
+
+// reset forgot password
+router.patch("/api/user/resetPassword", resetPassword);
 
 export default router;

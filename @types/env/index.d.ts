@@ -10,6 +10,8 @@ declare global {
       URL: string;
       STRIPE_PRIVATE_KEY: string;
       STRIPE_ENDPOINT_SECRET: string;
+      EMAIL_ADRESS: string;
+      EMAIL_PWD: string;
     }
   }
 }
