@@ -39,6 +39,6 @@ CREATE TABLE review(
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP() NOT NULL,
     updatedAt TIMESTAMP NULL,
     PRIMARY KEY (userID,productID),
-    FOREIGN KEY (productID) REFERENCES product(productID),
-    FOREIGN KEY (userID) REFERENCES user(userID)
+    FOREIGN KEY (productID) REFERENCES product(productID) ON CASCADE DELETE,
+    FOREIGN KEY (userID) REFERENCES user(userID) ON CASCADE DELETE
 );

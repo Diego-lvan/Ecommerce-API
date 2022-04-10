@@ -4,6 +4,7 @@ import "dotenv/config";
 import { User } from "../controllers/auth";
 import pool from "../config/conn";
 import bcrypt from "bcrypt";
+import { validationResult } from "express-validator";
 
 const authToken = async (req: Request, res: Response, next: NextFunction) => {
   const authHeader: string = req.headers["authorization"]!;
@@ -17,6 +18,10 @@ const authToken = async (req: Request, res: Response, next: NextFunction) => {
 };
 const userExists = async (req: Request, res: Response, next: NextFunction) => {
   const user: User = req.body;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ error: errors.array() });
+  }
   const sql = "SELECT email,pwd,userID FROM user WHERE email = ?";
   const [exists]: any = await pool.query(sql, [user.email]);
   [req.exists] = exists;

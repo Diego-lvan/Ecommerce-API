@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from "express";
 import pool from "../config/conn";
 import { unlink } from "fs/promises";
 import getInfo from "../utils/getInfo";
+import { validationResult } from "express-validator";
 interface Product {
   id?: number;
   name: string;
@@ -39,6 +40,10 @@ const getProductByID = async (req: Request, res: Response) => {
 };
 
 const addProduct = async (req: Request, res: Response) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ error: errors.array() });
+  }
   let product: Product = req.body;
   const sql: string = `INSERT INTO product (name,price,stock,brand) VALUES (?,?,?,?)`;
 
@@ -58,6 +63,10 @@ const updateImage = async (req: Request, res: Response) => {
 };
 
 const updateProduct = async (req: Request, res: Response) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ error: errors.array() });
+  }
   const { productID, name, price, stock, brand } = req.body;
   const sql = "UPDATE product SET name = ?, price=?,stock=?,brand=? WHERE productID = ?";
   await pool.query(sql, [name, price, stock, brand, productID]);
@@ -68,6 +77,7 @@ const deleteProduct = async (req: Request, res: Response) => {
   const productID = req.params?.productID;
   const sql = "SELECT img FROM product WHERE productID = ?";
   const [[data]]: any = await pool.query(sql, [productID]);
+  if (data?.img === undefined) return res.json({ error: "Product not found" });
   if (data?.img !== "not-found.png") unlink(`upload/${data?.img}`);
   await pool.query("DELETE FROM product WHERE productID = ?", [productID]);
   res.json({ success: true });

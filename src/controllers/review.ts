@@ -1,4 +1,5 @@
 import { NextFunction, Response, Request } from "express";
+import { validationResult } from "express-validator";
 import pool from "../config/conn";
 
 interface Review {
@@ -9,6 +10,10 @@ interface Review {
 }
 
 const addReview = async (req: Request, res: Response, next: NextFunction) => {
+  const errros = validationResult(req);
+  if (!errros.isEmpty()) {
+    return res.json({ error: errros.array() });
+  }
   try {
     const userID = req.userID;
     const { productID, title, review, rate }: Review = req.body;
@@ -46,9 +51,18 @@ const getReviews = async (req: Request, res: Response) => {
 };
 
 const updateReview = async (req: Request, res: Response) => {
+  const errros = validationResult(req);
+  if (!errros.isEmpty()) {
+    return res.json({ error: errros.array() });
+  }
   try {
     const userID: number = req.userID;
     const { productID, title, review, rate }: Review = req.body;
+    const [[data]]: any = await pool.query("SELECT productID FROM review WHERE productID = ? AND userID = ? ", [
+      productID,
+      userID,
+    ]);
+    if (data === undefined) return res.json({ error: "review does not exist" });
     const sql = "UPDATE review SET title = ?, review = ?, rate = ?, updatedAt = NOW() WHERE productID = ? AND userID = ?";
     await pool.query(sql, [title, review, rate, productID, userID]);
     res.json({ success: true });

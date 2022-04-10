@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { body } from "express-validator";
 import {
   addProduct,
   deleteProduct,
@@ -11,6 +12,13 @@ import { authToken, isAdmin } from "../middlewares/auth";
 import upload from "../middlewares/uploadFile";
 const router = Router();
 
+const productValidation = [
+  body("name").isString().isLength({ max: 40, min: 3 }),
+  body("price").isNumeric(),
+  body("stock").isInt(),
+  body("brand").isString().isLength({ max: 25 }),
+];
+
 //get products
 router.get("/api/product", paginationProducts);
 
@@ -18,13 +26,13 @@ router.get("/api/product", paginationProducts);
 router.get("/api/product/:productID", getProductByID);
 
 //add new product
-router.post("/api/product", authToken, isAdmin, addProduct);
+router.post("/api/product", authToken, isAdmin, productValidation, addProduct);
 
 //upload image
 router.post("/api/product/uploadImg", authToken, isAdmin, upload.single("img"), updateImage);
 
 //update product
-router.put("/api/product", authToken, isAdmin, updateProduct);
+router.put("/api/product", authToken, isAdmin, productValidation, body("productID").isInt(), updateProduct);
 
 //delete prodcut
 router.delete("/api/product/:productID", authToken, isAdmin, deleteProduct);

@@ -2,6 +2,7 @@ import { Request, Response, Express, NextFunction } from "express";
 import "dotenv/config";
 import Stripe from "stripe";
 import pool from "../config/conn";
+import { validationResult } from "express-validator";
 const stripe = new Stripe(process.env.STRIPE_PRIVATE_KEY!, { apiVersion: "2020-08-27" });
 interface saleInfo {
   productID: number;
@@ -19,6 +20,10 @@ interface sale {
 }
 
 const createStripeSession = async (req: Request, res: Response) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.json({ error: errors.array() });
+  }
   let { successURL, cancelURL, sales }: { successURL: string; cancelURL: string; sales: any } = req.body;
   try {
     const userID: number = req.userID;
@@ -49,7 +54,7 @@ const createStripeSession = async (req: Request, res: Response) => {
     await insertSale(sales, saleID, session.amount_total!, userID);
     res.json({ url: session.url });
   } catch (error) {
-    res.status(500).json(error);
+    res.status(400).json({ error: "bad request" });
   }
 };
 
