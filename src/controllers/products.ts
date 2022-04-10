@@ -35,7 +35,7 @@ const getProductByID = async (req: Request, res: Response) => {
   const { productID } = req.params;
   const sql = "SELECT * FROM product WHERE productID = ?";
   const [[product]]: any = await pool.query(sql, [productID]);
-  res.json(product);
+  res.json({ product });
 };
 
 const addProduct = async (req: Request, res: Response) => {
@@ -43,7 +43,7 @@ const addProduct = async (req: Request, res: Response) => {
   const sql: string = `INSERT INTO product (name,price,stock,brand) VALUES (?,?,?,?)`;
 
   await pool.query(sql, Object.values(product));
-  res.json(product);
+  res.json({ success: true });
 };
 
 const updateImage = async (req: Request, res: Response) => {
