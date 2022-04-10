@@ -83,9 +83,8 @@ const forgotPassword = async (req: Request, res: Response) => {
   };
   trasporter.sendMail(options, (err, info) => {
     if (err) return res.json({ err });
-    console.log(info.response);
+    res.json({ link });
   });
-  res.json({ link });
 };
 
 const resetPassword = async (req: Request, res: Response) => {

@@ -1,7 +1,6 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "start": "node build/server.js",
@@ -34,5 +33,14 @@
     "mysql2": "^2.3.3",
     "nodemailer": "^6.7.3",
     "stripe": "^8.215.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Diego-lvan/e-coommerce.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Diego-lvan/e-coommerce/issues"
+  },
+  "homepage": "https://github.com/Diego-lvan/e-coommerce#readme",
+  "description": ""
 }
