@@ -86,7 +86,7 @@ const handleWebHook = async (req: Request, res: Response, next: NextFunction) =>
 
 const getSingleSale = async (req: Request, res: Response) => {
   const saleID: string = req.params.saleID;
-  const sql = "CALL getSaleByID(?)";
+  const sql = "CALL getSales(?,NULL,NULL,NULL,NULL,NULL,NULL)";
   const [[data]]: any = await pool.query(sql, [saleID]);
   if (data.length === 0) return res.json({ error: "There is nothing here" });
   res.json({ sales: data });
