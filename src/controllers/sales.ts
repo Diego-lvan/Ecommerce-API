@@ -3,6 +3,7 @@ import "dotenv/config";
 import Stripe from "stripe";
 import pool from "../config/conn";
 import { validationResult } from "express-validator";
+import { Product } from "./products";
 const stripe = new Stripe(process.env.STRIPE_PRIVATE_KEY!, { apiVersion: "2020-08-27" });
 interface saleInfo {
   productID: number;
@@ -12,12 +13,9 @@ interface saleInfo {
   subTotal: number;
 }
 
-interface sale {
-  date: string;
-  delivered: boolean;
-  totalPrice: number;
-  userID: number;
-}
+const enoughProduct = (products: Product[]) => {
+  return products.every((product: Product) => product.enoughStock === 1);
+};
 
 const createStripeSession = async (req: Request, res: Response) => {
   const errors = validationResult(req);
@@ -29,7 +27,12 @@ const createStripeSession = async (req: Request, res: Response) => {
     const userID: number = req.userID;
     const IDs = sales.map((sale: saleInfo) => sale.productID).join(",");
     const [[{ email }]]: any = await pool.query("SELECT email FROM user WHERE userID = ?", [userID]);
-    const [data]: any = await pool.query(`SELECT price,name FROM product WHERE productID IN (${IDs})`);
+    //select products and check if there are enough stock
+    const sqlStockInfo = sales.map((sale: saleInfo) => `WHEN ${sale.productID} THEN stock >= ${sale.quantity}`).join(" ");
+    const sql = `SELECT CASE productID ${sqlStockInfo} END "enoughStock",price,name,stock FROM product WHERE productID IN (${IDs}) `;
+    const [data]: any[] = await pool.query(sql);
+    if (!enoughProduct(data)) return res.json({ error: "Not enough products" });
+
     sales = sales.map((sale: saleInfo, i: number) => ({ price: data[i].price, name: data[i].name, ...sale }));
     const session = await stripe.checkout.sessions.create({
       customer_email: email,
@@ -75,11 +78,20 @@ const handleWebHook = async (req: Request, res: Response, next: NextFunction) =>
     let event = await stripe.webhooks.constructEvent(payloadString, header, process.env.STRIPE_ENDPOINT_SECRET);
     if (event.type === "checkout.session.completed") {
       const data: any = event.data.object;
+
       const saleID: string = data.id;
       await pool.query("UPDATE sale SET succeded = true WHERE saleID = ?", [saleID]);
+      //update stock product
+      const [saleInfo]: any[] = await pool.query("SELECT * FROM sale WHERE saleID = ? ", [data.id]);
+      const updateData = saleInfo.map((sale: saleInfo) => `WHEN ${sale.productID} THEN stock - ${sale.quantity}`).join(" ");
+      const sqlUpdateStock = `UPDATE product SET  stock  = CASE productID ${updateData} END WHERE productID IN (${saleInfo.map(
+        (sale: saleInfo) => sale.productID
+      )}) `;
+      await pool.query(sqlUpdateStock);
       res.send();
     }
   } catch (e: any) {
+    console.log(e);
     return res.status(400).send(`Webhook Error: ${e.message}`);
   }
 };
