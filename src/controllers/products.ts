@@ -4,13 +4,14 @@ import pool from "../config/conn";
 import { unlink } from "fs/promises";
 import getInfo from "../utils/getInfo";
 import { validationResult } from "express-validator";
-interface Product {
+export interface Product {
   id?: number;
   name: string;
   price: number;
   stock: number;
   brand: string;
   rating?: number;
+  enoughStock?: number;
 }
 
 const orderBy = ["brand", "price", "stock", "name", "rating"];
