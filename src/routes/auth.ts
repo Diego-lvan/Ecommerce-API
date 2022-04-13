@@ -7,7 +7,7 @@ const router: Router = express();
 const validateUserPwd = [body("email").isEmail(), body("pwd").isLength({ min: 5 })];
 
 //login user
-router.post("/api/auth/login", validateUserPwd, userExists, verifyCredentials, loginUser);
+router.post("/api/auth/login", userExists, verifyCredentials, loginUser);
 
 //register user
 router.post("/api/auth/register", validateUserPwd, userExists, registerUser);
