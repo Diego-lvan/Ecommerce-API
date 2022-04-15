@@ -1,4 +1,8 @@
 # Ecommerce-API
+
+## Hosted in Heroku 
+https://e-commerce-api-diego.herokuapp.com/
+
 ## Documentation
 https://documenter.getpostman.com/view/16106456/UVyxQtsm
 
