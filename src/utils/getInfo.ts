@@ -12,6 +12,8 @@ const getInfo = (page: number, limit: number, totalPages: number, countRows: num
   const queriesUrl = queries
     .map((query) => {
       const key = Object.keys(query)[0];
+      //if null dont show it in the url
+      if (query[key] === null) return "";
       return `&${key}=${query[key]}`;
     })
     .join("");
