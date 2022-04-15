@@ -57,7 +57,7 @@ const createStripeSession = async (req: Request, res: Response) => {
     await insertSale(sales, saleID, session.amount_total!, userID);
     res.json({ url: session.url });
   } catch (error) {
-    res.status(400).json({ error: "bad request" });
+    res.status(400).json({ error });
   }
 };
 
