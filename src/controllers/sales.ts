@@ -73,9 +73,9 @@ const handleWebHook = async (req: Request, res: Response, next: NextFunction) =>
     const payloadString: string = JSON.stringify(req.body, null, 2);
     const header: string = stripe.webhooks.generateTestHeaderString({
       payload: payloadString,
-      secret: process.env.STRIPE_ENDPOINT_SECRET,
+      secret: process.env.STRIPE_RESTRICTED_KEY,
     });
-    let event = await stripe.webhooks.constructEvent(payloadString, header, process.env.STRIPE_ENDPOINT_SECRET);
+    let event = await stripe.webhooks.constructEvent(payloadString, header, process.env.STRIPE_RESTRICTED_KEY);
     if (event.type === "checkout.session.completed") {
       const data: any = event.data.object;
 
