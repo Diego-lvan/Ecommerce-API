@@ -30,6 +30,7 @@ const paginationProducts = async (req: Request, res: Response, next: NextFunctio
   if (countRows === 0) return res.json({ error: "There is nothing here" });
   const [[results]]: any = await pool.query("CALL paginationFilterProducts(?,?,?,?,?)", [maxPrice, start, limit, brand, order]);
   const info = getInfo(page, limit, totalPages, countRows, [{ maxPrice }, { brand }, { order }], "product");
+  console.log(info);
   res.json({ info, results });
 };
 
