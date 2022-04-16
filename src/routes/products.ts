@@ -14,8 +14,8 @@ const router = Router();
 
 const productValidation = [
   body("name").isString().isLength({ max: 40, min: 3 }),
-  body("price").isNumeric(),
-  body("stock").isInt(),
+  body("price").isFloat({ min: 1 }),
+  body("stock").isInt({ min: 0 }),
   body("brand").isString().isLength({ max: 25 }),
 ];
 
