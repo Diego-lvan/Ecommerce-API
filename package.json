@@ -9,6 +9,12 @@
     "test": "jest --watch",
     "debug": "nodemon --exec \"node --inspect --require ts-node/register src/server.ts\""
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run test",
+      "pre-push": "npm run test"
+    }
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -23,6 +29,7 @@
     "@types/node": "^17.0.23",
     "@types/nodemailer": "^6.4.4",
     "@types/supertest": "^2.0.12",
+    "husky": "^7.0.4",
     "nodemon": "^2.0.15",
     "supertest": "^6.2.2",
     "ts-jest": "^27.1.4",
