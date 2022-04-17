@@ -99,7 +99,7 @@ const deleteProduct = async (req: Request, res: Response, next: NextFunction) =>
   try {
     const sql = "SELECT img FROM product WHERE productID = ?";
     const [[data]]: any = await pool.query(sql, [productID]);
-    if (data?.img === undefined) return res.json({ error: "Product not found" });
+    if (data?.img === undefined) return res.json({ success: true });
     if (data?.img !== "not-found.png") unlink(`upload/${data?.img}`);
     await pool.query("DELETE FROM product WHERE productID = ?", [productID]);
     res.json({ success: true });
