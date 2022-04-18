@@ -29,12 +29,12 @@ const userExists = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 const verifyCredentials = async (req: Request, res: Response, next: NextFunction) => {
-  if (req.exists === undefined) return res.json({ msg: "User does not exist" });
+  if (req.exists === undefined) return res.status(401).json({ msg: "User does not exist" });
   const hashedPwd: string = req.exists.pwd;
   const pwd: string = req.body.pwd;
   const pwdMatch = await bcrypt.compare(pwd, hashedPwd);
   if (pwdMatch) return next();
-  res.json({ msg: "Password does not match" });
+  res.status(401).json({ msg: "Password does not match" });
 };
 
 const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
@@ -42,7 +42,7 @@ const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
   const sql = "SELECT isAdmin FROM user WHERE userID = ?";
   const [[data]]: any = await pool.query(sql, [userID]);
   if (data?.isAdmin === 1) return next();
-  res.json({ msg: "You are not an admin" });
+  res.status(401).json({ msg: "You are not an admin" });
 };
 
 export { authToken, userExists, verifyCredentials, isAdmin };
