@@ -10,6 +10,6 @@ const validateUserPwd = [body("email").isEmail(), body("pwd").isLength({ min: 5 
 router.post("/api/auth/login", userExists, verifyCredentials, loginUser);
 
 //register user
-router.post("/api/auth/register", validateUserPwd, userExists, registerUser);
+router.post("/api/auth/register", validateUserPwd, userExists, registerUser, userExists, loginUser);
 
 export default router;
