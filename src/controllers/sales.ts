@@ -5,7 +5,7 @@ import pool from "../config/conn";
 import { validationResult } from "express-validator";
 import { Product } from "./products";
 const stripe = new Stripe(process.env.STRIPE_PRIVATE_KEY!, { apiVersion: "2020-08-27" });
-interface saleInfo {
+export interface saleInfo {
   productID: number;
   quantity: number;
   price?: number;
@@ -31,7 +31,7 @@ const createStripeSession = async (req: Request, res: Response) => {
     const sqlStockInfo = sales.map((sale: saleInfo) => `WHEN ${sale.productID} THEN stock >= ${sale.quantity}`).join(" ");
     const sql = `SELECT CASE productID ${sqlStockInfo} END "enoughStock",price,name,stock FROM product WHERE productID IN (${IDs}) `;
     const [data]: any[] = await pool.query(sql);
-    if (!enoughProduct(data)) return res.json({ error: "Not enough products" });
+    if (!enoughProduct(data)) return res.status(400).json({ error: "Not enough products" });
 
     sales = sales.map((sale: saleInfo, i: number) => ({ price: data[i].price, name: data[i].name, ...sale }));
     const session = await stripe.checkout.sessions.create({
@@ -55,7 +55,7 @@ const createStripeSession = async (req: Request, res: Response) => {
     });
     const saleID: string = session.id;
     await insertSale(sales, saleID, session.amount_total!, userID);
-    res.json({ url: session.url });
+    res.status(201).json({ url: session.url });
   } catch (error) {
     res.status(400).json({ error });
   }
