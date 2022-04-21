@@ -12,22 +12,18 @@ const loginUser = (req: Request, res: Response, next: NextFunction) => {
   const userID: string = req.exists.userID;
   try {
     const accessToken = jwt.sign(userID, process.env.ACCESS_TOKEN_SECRET!);
-    res.json({ accessToken: `Bearer ${accessToken}` });
+    res.json({ accessToken: `Bearer ${accessToken}`, userID });
   } catch (error) {
     next(error);
   }
 };
 
 const registerUser = async (req: Request, res: Response, next: NextFunction) => {
-  if (req.exists !== undefined) return res.json({ msg: "user exists" });
+  if (req.exists !== undefined) return res.status(400).json({ msg: "user exists", user: req.exists });
   const user: User = req.body;
-  try {
-    user.pwd = await bcrypt.hash(user.pwd, 10);
-    await pool.query("INSERT INTO user (email,pwd) VALUES (?,?)", [user.email, user.pwd]);
-    res.status(201).json({ email: user.email });
-  } catch (error) {
-    next(error);
-  }
+  user.pwd = await bcrypt.hash(user.pwd, 10);
+  await pool.query("INSERT INTO user (email,pwd) VALUES (?,?)", [user.email, user.pwd]);
+  next();
 };
 
 export { loginUser, registerUser };
